@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:num_num/features/profile_setup/domain/entities/category.dart';
-import 'package:num_num/features/profile_setup/domain/entities/progress.dart';
+import 'package:num_num/features/math_game/domain/entities/category.dart';
+import 'package:num_num/features/math_game/domain/entities/progress.dart';
+import 'package:num_num/features/math_game/data/models/progress_model.dart';
 
 /// Provider para manejar las categorías y el progreso
 class CategoryProvider extends ChangeNotifier {
@@ -47,7 +48,7 @@ class CategoryProvider extends ChangeNotifier {
 
       if (progressJson != null) {
         final Map<String, dynamic> data = jsonDecode(progressJson);
-        _progress = ChildProgress.fromJson(data);
+        _progress = ChildProgressModel.fromJson(data).toEntity();
       } else {
         // Crear progreso inicial vacío
         _progress = ChildProgress(
@@ -72,7 +73,8 @@ class CategoryProvider extends ChangeNotifier {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_progressKey, jsonEncode(_progress!.toJson()));
+      final model = ChildProgressModel.fromEntity(_progress!);
+      await prefs.setString(_progressKey, jsonEncode(model.toJson()));
     } catch (e) {
       debugPrint('Error saving progress: $e');
     }

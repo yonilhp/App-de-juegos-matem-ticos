@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:num_num/app/routes/app_routes.dart';
+import 'package:num_num/app/themes/app_theme.dart';
 import 'package:num_num/features/profile_setup/presentation/providers/profile_provider.dart';
 import 'package:num_num/features/math_game/presentation/providers/category_provider.dart';
 import 'package:num_num/features/math_game/presentation/providers/game_provider.dart';
@@ -19,11 +20,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'NumNum - Aprende Jugando',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          fontFamily: 'Roboto',
-          useMaterial3: true,
-        ),
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
         routerConfig: router,
       ),
     );

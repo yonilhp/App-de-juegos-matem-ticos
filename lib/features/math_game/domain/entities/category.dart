@@ -1,21 +1,17 @@
 /// Estado de una categoría
-enum CategoryStatus {
-  locked, // 🔒 Bloqueada
-  active, // 🎮 Activa (disponible para jugar)
-  completed, // ✅ Completada
-}
+enum CategoryStatus { locked, active, completed }
 
-/// Categoría de aprendizaje
+/// Categoría de aprendizaje - Entity pura de dominio
 class Category {
   final String id;
   final String name;
   final String emoji;
   final String description;
-  final int order; // Orden de desbloqueo (1, 2, 3, 4...)
-  final int totalQuestions; // Total de preguntas para completar
-  final String color; // Color hex para la UI
+  final int order;
+  final int totalQuestions;
+  final String color;
 
-  Category({
+  const Category({
     required this.id,
     required this.name,
     required this.emoji,
@@ -25,30 +21,18 @@ class Category {
     required this.color,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'emoji': emoji,
-    'description': description,
-    'order': order,
-    'totalQuestions': totalQuestions,
-    'color': color,
-  };
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Category && runtimeType == other.runtimeType && id == other.id;
 
-  factory Category.fromJson(Map<String, dynamic> json) => Category(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    emoji: json['emoji'] as String,
-    description: json['description'] as String,
-    order: json['order'] as int,
-    totalQuestions: json['totalQuestions'] as int? ?? 10,
-    color: json['color'] as String,
-  );
+  @override
+  int get hashCode => id.hashCode;
 }
 
-/// Categorías predefinidas de la app
+/// Categorías predefinidas de la app (datos locales de prueba)
 class AppCategories {
-  static final List<Category> all = [
+  static const List<Category> all = [
     Category(
       id: 'animals',
       name: 'Animales',

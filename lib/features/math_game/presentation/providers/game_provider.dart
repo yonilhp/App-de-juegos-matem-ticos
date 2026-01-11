@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:num_num/features/profile_setup/domain/entities/question.dart';
-import 'package:num_num/features/profile_setup/domain/entities/category.dart';
+import 'package:num_num/features/math_game/domain/entities/visual_question.dart';
+import 'package:num_num/features/math_game/domain/entities/category.dart';
 
 /// Estado del juego
 enum GameState { initial, playing, correct, wrong, completed }
@@ -9,7 +9,7 @@ enum GameState { initial, playing, correct, wrong, completed }
 class GameProvider extends ChangeNotifier {
   String? _currentCategoryId;
   Category? _currentCategory;
-  List<Question> _questions = [];
+  List<VisualQuestion> _questions = [];
   int _currentQuestionIndex = 0;
   GameState _state = GameState.initial;
   int _correctAnswers = 0;
@@ -19,9 +19,9 @@ class GameProvider extends ChangeNotifier {
   // Getters
   String? get currentCategoryId => _currentCategoryId;
   Category? get currentCategory => _currentCategory;
-  List<Question> get questions => _questions;
+  List<VisualQuestion> get questions => _questions;
   int get currentQuestionIndex => _currentQuestionIndex;
-  Question? get currentQuestion =>
+  VisualQuestion? get currentQuestion =>
       _questions.isNotEmpty && _currentQuestionIndex < _questions.length
       ? _questions[_currentQuestionIndex]
       : null;

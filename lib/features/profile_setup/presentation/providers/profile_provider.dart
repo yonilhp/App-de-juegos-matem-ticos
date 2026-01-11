@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:num_num/features/profile_setup/domain/entities/child_profile.dart';
+import 'package:num_num/features/profile_setup/data/models/child_profile_model.dart';
 
 /// Provider para manejar el perfil del niño
 class ProfileProvider extends ChangeNotifier {
@@ -31,7 +32,7 @@ class ProfileProvider extends ChangeNotifier {
 
       if (profileJson != null) {
         final Map<String, dynamic> data = jsonDecode(profileJson);
-        _profile = ChildProfile.fromJson(data);
+        _profile = ChildProfileModel.fromJson(data).toEntity();
       }
 
       _error = null;
@@ -64,7 +65,8 @@ class ProfileProvider extends ChangeNotifier {
       );
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_profileKey, jsonEncode(profile.toJson()));
+      final model = ChildProfileModel.fromEntity(profile);
+      await prefs.setString(_profileKey, jsonEncode(model.toJson()));
 
       _profile = profile;
       _isLoading = false;
@@ -94,7 +96,8 @@ class ProfileProvider extends ChangeNotifier {
       );
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_profileKey, jsonEncode(updatedProfile.toJson()));
+      final model = ChildProfileModel.fromEntity(updatedProfile);
+      await prefs.setString(_profileKey, jsonEncode(model.toJson()));
 
       _profile = updatedProfile;
       notifyListeners();

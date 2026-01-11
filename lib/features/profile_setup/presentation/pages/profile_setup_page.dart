@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:num_num/app/themes/app_colors.dart';
 import 'package:num_num/features/profile_setup/presentation/widgets/custom_text_field.dart';
+import 'package:num_num/shared/widgets/primary_action_button.dart';
 import 'package:provider/provider.dart';
 import 'package:num_num/features/profile_setup/presentation/providers/profile_provider.dart';
 
@@ -93,37 +95,52 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                // Indicador de progreso
-                Row(
-                  children: [
-                    _buildStepIndicator(0, '📝'),
-                    Expanded(
-                      child: Container(
-                        height: 3,
-                        color: _currentStep >= 1
-                            ? Colors.white
-                            : Colors.white38,
+          child: Column(
+            children: [
+              // Contenido scrolleable
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  child: Column(
+                    children: [
+                      // Indicador de progreso
+                      Row(
+                        children: [
+                          _buildStepIndicator(0, '📝'),
+                          Expanded(
+                            child: Container(
+                              height: 3,
+                              color: _currentStep >= 1
+                                  ? AppColors.progressLight
+                                  : Colors.white38,
+                            ),
+                          ),
+                          _buildStepIndicator(1, '🐾'),
+                        ],
                       ),
-                    ),
-                    _buildStepIndicator(1, '🐾'),
-                  ],
-                ),
 
-                const SizedBox(height: 40),
+                      const SizedBox(height: 40),
 
-                // Contenido según el paso
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: _currentStep == 0
-                      ? _buildNameStep()
-                      : _buildAvatarStep(),
+                      // Contenido según el paso (sin botones)
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: _currentStep == 0
+                            ? _buildNameStepContent()
+                            : _buildAvatarStepContent(),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+
+              // Botones fijos en la parte inferior
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                child: _currentStep == 0
+                    ? _buildNameStepButton()
+                    : _buildAvatarStepButtons(),
+              ),
+            ],
           ),
         ),
       ),
@@ -136,7 +153,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       width: 50,
       height: 50,
       decoration: BoxDecoration(
-        color: isActive ? Colors.white : Colors.white38,
+        color: isActive ? AppColors.progressLight : Colors.white38,
         shape: BoxShape.circle,
         boxShadow: isActive
             ? [
@@ -154,7 +171,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     );
   }
 
-  Widget _buildNameStep() {
+  Widget _buildNameStepContent() {
     return Column(
       key: const ValueKey('name'),
       children: [
@@ -188,15 +205,22 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
           hint: 'Tu apellido (opcional)',
           icon: Icons.family_restroom,
         ),
-
-        const SizedBox(height: 40),
-
-        _buildNextButton('Siguiente', Icons.arrow_forward_rounded),
       ],
     );
   }
 
-  Widget _buildAvatarStep() {
+  Widget _buildNameStepButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: PrimaryActionButton(
+        text: 'Siguiente',
+        icon: Icons.arrow_forward_rounded,
+        onPressed: _nextStep,
+      ),
+    );
+  }
+
+  Widget _buildAvatarStepContent() {
     return Column(
       key: const ValueKey('avatar'),
       children: [
@@ -223,7 +247,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -250,7 +274,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Color(avatar['color'] as int).withOpacity(0.2)
+                        ? Color(avatar['color'] as int).withValues(alpha: 0.2)
                         : Colors.grey[100],
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
@@ -271,64 +295,33 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
             },
           ),
         ),
-
-        const SizedBox(height: 30),
-
-        // Botón de atrás y continuar
-        Row(
-          children: [
-            TextButton.icon(
-              onPressed: () => setState(() => _currentStep = 0),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              label: const Text(
-                'Atrás',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-            const Spacer(),
-            Expanded(
-              flex: 2,
-              child: _buildNextButton(
-                _isLoading ? 'Guardando...' : 'A jugar!',
-                Icons.play_arrow_rounded,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
-  Widget _buildNextButton(String text, IconData icon) {
-    return ElevatedButton(
-      onPressed: _isLoading ? null : _nextStep,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF3a47d5),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 5,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (_isLoading)
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else ...[
-            Text(
-              text,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 5),
-            Icon(icon),
-          ],
-        ],
-      ),
+  Widget _buildAvatarStepButtons() {
+    return Row(
+      children: [
+        TextButton.icon(
+          onPressed: () => setState(() => _currentStep = 0),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          label: const Text(
+            'Atrás',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ),
+        const Spacer(),
+        Expanded(
+          flex: 5,
+          child: PrimaryActionButton(
+            onPressed: _nextStep,
+            text: '¡A jugar!',
+            icon: Icons.play_arrow_rounded,
+            isLoading: _isLoading,
+            loadingText: 'Guardando...',
+          ),
+        ),
+      ],
     );
   }
 }

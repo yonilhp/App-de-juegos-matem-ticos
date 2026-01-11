@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:num_num/app/themes/app_colors.dart';
+import 'package:num_num/shared/widgets/primary_action_button.dart';
 import 'package:provider/provider.dart';
-import 'package:num_num/features/profile_setup/domain/entities/category.dart';
+import 'package:num_num/features/math_game/domain/entities/category.dart';
 import 'package:num_num/features/math_game/presentation/providers/game_provider.dart';
 import 'package:num_num/features/math_game/presentation/providers/category_provider.dart';
 
@@ -55,6 +57,9 @@ class _GamePageState extends State<GamePage> {
     Color color,
   ) {
     final question = gameProvider.currentQuestion;
+    final showFeedback =
+        gameProvider.state == GameState.correct ||
+        gameProvider.state == GameState.wrong;
 
     return Column(
       children: [
@@ -89,7 +94,7 @@ class _GamePageState extends State<GamePage> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -112,172 +117,154 @@ class _GamePageState extends State<GamePage> {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: gameProvider.progressPercent,
-              backgroundColor: Colors.white.withOpacity(0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.progressLight,
+              ),
               minHeight: 8,
             ),
           ),
         ),
 
-        const SizedBox(height: 30),
+        const SizedBox(height: 16),
 
-        // Imagen de la pregunta
+        // Contenido principal scrolleable
         Expanded(
-          flex: 2,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 30),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Center(
-              child: question != null
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Placeholder de imagen (después vendrán de Firebase)
-                        Container(
-                          padding: const EdgeInsets.all(30),
-                          decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            _getEmojiForAnswer(question.correctAnswer),
-                            style: const TextStyle(fontSize: 80),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          '¿Qué es esto?',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    )
-                  : const CircularProgressIndicator(),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        // Feedback de respuesta
-        if (gameProvider.state == GameState.correct ||
-            gameProvider.state == GameState.wrong)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 30),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: gameProvider.state == GameState.correct
-                  ? Colors.green
-                  : Colors.red,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  gameProvider.state == GameState.correct
-                      ? Icons.check_circle
-                      : Icons.cancel,
-                  color: Colors.white,
-                  size: 28,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  gameProvider.state == GameState.correct
-                      ? '¡Correcto! 🎉'
-                      : '¡Inténtalo de nuevo!',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        const SizedBox(height: 20),
-
-        // Opciones de respuesta
-        Expanded(
-          flex: 2,
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: question != null
-                ? Column(
-                    children: question.options.map((option) {
-                      return Expanded(
-                        child: _buildOptionButton(
-                          option: option,
-                          gameProvider: gameProvider,
-                          color: color,
+            child: Column(
+              children: [
+                // Imagen de la pregunta
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: question != null
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Emoji/imagen
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                _getEmojiForAnswer(question.correctAnswer),
+                                style: const TextStyle(fontSize: 70),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              '¿Qué es esto?',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Padding(
+                          padding: EdgeInsets.all(40),
+                          child: CircularProgressIndicator(),
                         ),
-                      );
-                    }).toList(),
-                  )
-                : const SizedBox(),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Feedback de respuesta (animado)
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  child: showFeedback
+                      ? Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            color: gameProvider.state == GameState.correct
+                                ? AppColors.success
+                                : AppColors.error,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                gameProvider.state == GameState.correct
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                gameProvider.state == GameState.correct
+                                    ? '¡Correcto! 🎉'
+                                    : '¡Inténtalo de nuevo!',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+
+                // Opciones de respuesta
+                if (question != null) ...[
+                  ...question.options.map((option) {
+                    return _buildOptionButton(
+                      option: option,
+                      gameProvider: gameProvider,
+                      color: color,
+                    );
+                  }),
+                ],
+
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
 
-        // Botón de siguiente (solo si ya respondió)
-        if (gameProvider.state == GameState.correct)
+        // Botón de acción fijo en la parte inferior
+        if (showFeedback)
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  gameProvider.nextQuestion();
-                  _checkCompletion(gameProvider);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: color,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: const Text(
-                  'Siguiente →',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ),
-
-        if (gameProvider.state == GameState.wrong)
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => gameProvider.retryQuestion(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: const Text(
-                  'Intentar de nuevo',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+              child: PrimaryActionButton(
+                onPressed: gameProvider.state == GameState.correct
+                    ? () {
+                        gameProvider.nextQuestion();
+                        _checkCompletion(gameProvider);
+                      }
+                    : () => gameProvider.retryQuestion(),
+                text: gameProvider.state == GameState.correct
+                    ? 'Siguiente'
+                    : 'Intentar de nuevo',
+                icon: gameProvider.state == GameState.correct
+                    ? Icons.arrow_forward_rounded
+                    : Icons.refresh_rounded,
               ),
             ),
           ),
@@ -300,10 +287,10 @@ class _GamePageState extends State<GamePage> {
     Color textColor = Colors.black87;
 
     if (showResult && isSelected) {
-      buttonColor = isCorrect ? Colors.green : Colors.red;
+      buttonColor = isCorrect ? AppColors.success : AppColors.error;
       textColor = Colors.white;
     } else if (showResult && isCorrect) {
-      buttonColor = Colors.green.withOpacity(0.5);
+      buttonColor = AppColors.success.withValues(alpha: 0.5);
     }
 
     return Padding(
@@ -319,7 +306,7 @@ class _GamePageState extends State<GamePage> {
             foregroundColor: textColor,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(40),
               side: BorderSide(
                 color: isSelected ? color : Colors.transparent,
                 width: 3,
@@ -370,7 +357,7 @@ class _GamePageState extends State<GamePage> {
                   _buildStatRow(
                     '✅ Correctas',
                     '${result.correctAnswers}',
-                    Colors.green,
+                    AppColors.progress,
                   ),
                   const SizedBox(height: 12),
                   _buildStatRow(
@@ -393,7 +380,7 @@ class _GamePageState extends State<GamePage> {
             // Botones
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: PrimaryActionButton(
                 onPressed: () async {
                   // Actualizar progreso
                   final categoryProvider = context.read<CategoryProvider>();
@@ -404,18 +391,7 @@ class _GamePageState extends State<GamePage> {
                     context.go('/categories');
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: color,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: const Text(
-                  '¡Continuar! 🚀',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                text: '¡Continuar! 🚀',
               ),
             ),
 

@@ -1,12 +1,12 @@
-/// Perfil del niño
+/// Perfil del niño - Entity pura de dominio
 class ChildProfile {
   final String id;
   final String firstName;
   final String lastName;
-  final String avatar; // emoji del animalito
+  final String avatar;
   final DateTime createdAt;
 
-  ChildProfile({
+  const ChildProfile({
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -14,23 +14,7 @@ class ChildProfile {
     required this.createdAt,
   });
 
-  String get fullName => '$firstName $lastName';
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'firstName': firstName,
-    'lastName': lastName,
-    'avatar': avatar,
-    'createdAt': createdAt.toIso8601String(),
-  };
-
-  factory ChildProfile.fromJson(Map<String, dynamic> json) => ChildProfile(
-    id: json['id'] as String,
-    firstName: json['firstName'] as String,
-    lastName: json['lastName'] as String,
-    avatar: json['avatar'] as String,
-    createdAt: DateTime.parse(json['createdAt'] as String),
-  );
+  String get fullName => '$firstName $lastName'.trim();
 
   ChildProfile copyWith({
     String? id,
@@ -47,4 +31,14 @@ class ChildProfile {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChildProfile &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

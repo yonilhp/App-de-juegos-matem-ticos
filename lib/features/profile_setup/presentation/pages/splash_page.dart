@@ -128,3 +128,45 @@ class _SplashPageState extends State<SplashPage>
     );
   }
 }
+
+
+// Container(
+//             color: Colors.white,
+//             padding: EdgeInsets.fromLTRB(
+//               24,
+//               16,
+//               24,
+//               MediaQuery.of(context).padding.bottom + 16,
+//             ),
+//             child: _currentStep == 0
+//                 ? SizedBox(
+//                     width: double.infinity,
+//                     child: PrimaryActionButton(
+//                       text: 'Siguiente',
+//                       icon: Icons.arrow_forward_rounded,
+//                       onPressed: _nextStep,
+//                     ),
+//                   )
+//                 : Row(
+//                     children: [
+//                       TextButton.icon(
+//                         onPressed: () => setState(() => _currentStep = 0),
+//                         icon: const Icon(Icons.arrow_back),
+//                         label: const Text(
+//                           'Atrás',
+//                           style: TextStyle(fontSize: 16),
+//                         ),
+//                       ),
+//                       const SizedBox(width: 16),
+//                       Expanded(
+//                         child: PrimaryActionButton(
+//                           text: '¡A jugar!',
+//                           icon: Icons.play_arrow_rounded,
+//                           isLoading: _isLoading,
+//                           loadingText: 'Guardando...',
+//                           onPressed: _nextStep,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//           ),
