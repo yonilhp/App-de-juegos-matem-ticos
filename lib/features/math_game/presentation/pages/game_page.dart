@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:num_num/app/themes/app_colors.dart';
 import 'package:num_num/shared/widgets/primary_action_button.dart';
+import 'package:num_num/shared/services/audio_service.dart';
 import 'package:provider/provider.dart';
 import 'package:num_num/features/math_game/domain/entities/category.dart';
 import 'package:num_num/features/math_game/presentation/providers/game_provider.dart';
@@ -17,12 +18,29 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  final AudioService _audioService = AudioService();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<GameProvider>().startGame(widget.categoryId);
     });
+  }
+
+  /// Manejar selección de respuesta y reproducir sonido
+  void _onAnswerSelected(String option, GameProvider gameProvider) {
+    final isCorrect = option == gameProvider.currentQuestion?.correctAnswer;
+
+    // Reproducir sonido según la respuesta
+    if (isCorrect) {
+      _audioService.playSuccess();
+    } else {
+      _audioService.playError();
+    }
+
+    // Actualizar estado del juego
+    gameProvider.selectAnswer(option);
   }
 
   @override
@@ -39,7 +57,7 @@ class _GamePageState extends State<GamePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [color, color.withOpacity(0.7)],
+            colors: [color, color.withValues(alpha: 0.7)],
           ),
         ),
         child: SafeArea(
@@ -144,7 +162,7 @@ class _GamePageState extends State<GamePage> {
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -158,7 +176,7 @@ class _GamePageState extends State<GamePage> {
                             Container(
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(
-                                color: color.withOpacity(0.1),
+                                color: color.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Text(
@@ -299,7 +317,7 @@ class _GamePageState extends State<GamePage> {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: gameProvider.state == GameState.playing
-              ? () => gameProvider.selectAnswer(option)
+              ? () => _onAnswerSelected(option, gameProvider)
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,

@@ -10,7 +10,7 @@ class AppColors {
   static const Color popover = Color(0xFFFFFFFF);
   static const Color popoverForeground = Color(0xFF0F172A);
 
-  static const Color primary = Color(0xFF2563EB);
+  static const Color primary = Color(0xFF3a47d5);
   static const Color primaryForeground = Color(0xFFFFFFFF);
 
   static const Color secondary = Color(0xFFF1F5F9);
